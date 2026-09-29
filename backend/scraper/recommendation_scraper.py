@@ -39,7 +39,7 @@ async def scrape_goodreads_carousel(url: str):
             link_loc = card.locator('a[href*="/book/show/"]').first
 
             # Extract available details
-            name = await title_loc.inner_text() if await title_loc.count() > 0 else None
+            title = await title_loc.inner_text() if await title_loc.count() > 0 else None
             author = await author_loc.inner_text() if await author_loc.count() > 0 else None
             rating = await rating_loc.inner_text() if await rating_loc.count() > 0 else None
             href = await link_loc.get_attribute("href") if await link_loc.count() > 0 else None
@@ -55,7 +55,7 @@ async def scrape_goodreads_carousel(url: str):
                     parsed_rating = rating.strip()
 
             books_data.append({
-                "name": name.strip() if name else None,
+                "title": title.strip() if title else None,
                 "author": author.strip() if author else None,
                 "rating": parsed_rating,
                 "book_url": book_url

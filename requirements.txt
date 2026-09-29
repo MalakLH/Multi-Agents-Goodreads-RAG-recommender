@@ -5,6 +5,7 @@ certifi==2026.7.22
 click==8.5.0
 cloudpickle==3.1.2
 colorama==0.4.6
+fastapi==0.141.1
 filelock==4.0.6
 fsspec==2026.9.0
 greenlet==3.5.6
@@ -35,6 +36,7 @@ pydantic==2.13.5
 pydantic_core==2.46.5
 pyee==13.0.1
 Pygments==2.21.0
+python-dotenv==1.2.3
 pywin32==312
 PyYAML==6.0.3
 qdrant-client==1.19.1
@@ -46,6 +48,7 @@ scipy==1.18.1
 sentence-transformers==6.1.0
 setuptools==84.0.0
 shellingham==1.5.4
+starlette==1.7.0
 sympy==1.14.0
 threadpoolctl==3.7.0
 tokenizers==0.23.2
@@ -56,3 +59,4 @@ typer==0.27.2
 typing-inspection==0.4.4
 typing_extensions==4.16.0
 urllib3==2.8.0
+uvicorn==0.54.0
