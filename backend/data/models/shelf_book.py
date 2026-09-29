@@ -1,13 +1,14 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
-from datetime import date
+from sqlalchemy import Column, Integer, String, Float, Date
+from backend.data.db.database import Base
 
 
-class ShelfBook(BaseModel):
-    id: int
-    title: str
-    author: str
-    book_url: Optional[HttpUrl] = None
-    user_rating: Optional[float] = None
-    avg_rating: Optional[float] = None
-    date_added: Optional[date] = None
+class ShelfBook(Base):
+    __tablename__ = "shelf_books"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    book_url = Column(String, nullable=True)
+    user_rating = Column(Float, nullable=True)
+    avg_rating = Column(Float, nullable=True)
+    date_added = Column(Date, nullable=True)

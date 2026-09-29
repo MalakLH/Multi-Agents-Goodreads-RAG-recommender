@@ -1,11 +1,14 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from sqlalchemy import String, Float, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 
-class Book(BaseModel):
-    id: int
-    title: str
-    author: str
-    avg_rating: Optional[float] = None
-    genres: List[str] = []
-    description: Optional[str] = None
-    reviews: List[str] = []
+from backend.data.db.database import Base
+
+
+class Book(Base):
+    __tablename__ = "books"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    author: Mapped[str] = mapped_column(String, nullable=False)
+    avg_rating: Mapped[float | None] = mapped_column(Float)
+    description: Mapped[str | None] = mapped_column(String)
