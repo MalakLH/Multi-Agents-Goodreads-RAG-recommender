@@ -9,6 +9,7 @@ class BookCreate(BaseModel):
     genres: list[str] = Field(default_factory=list)
     description: Optional[str] = None
     reviews: list[str] = Field(default_factory=list)
+    book_url: Optional[str] = None
 
 
 class BookResponse(BookCreate):
