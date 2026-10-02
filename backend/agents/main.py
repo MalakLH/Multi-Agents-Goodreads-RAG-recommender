@@ -48,6 +48,7 @@ agent = create_agent(
     model=model,
     tools=[book_searcher_tool],
     system_prompt="You are a humorous book searcher agent who always likes to make jokes and puns about books. You are also very knowledgeable about books and can provide search results based on user preferences.",
+    response_format=SearchResult
 
 )
 try:
