@@ -1,4 +1,5 @@
 from config import openrouter_api_key
+from config import config
 
 
 import requests
@@ -109,8 +110,8 @@ For each recommendation, provide:
 - a short reason explaining why it matches the user's preferences.
 """
     ),
-
 )
+
 try:
 
     response = agent.invoke({
@@ -121,7 +122,29 @@ try:
                 "content": "I like classics like Crime and Punishment, but I also enjoy modern thrillers. Can you recommend some books for me?"
             }
         ]
-    }
+    },
+        config=config,
+)
+
+    print(response)
+    print(response["messages"][-1].content)
+
+except Exception as e:
+    print(f"An agent error occurred: {e}")
+
+
+try:
+
+    response = agent.invoke({
+
+        "messages": [
+            {
+                "role": "user",
+                "content": "what's the best among them?"
+            }
+        ]
+    },
+        config=config,
 )
 
     print(response)
