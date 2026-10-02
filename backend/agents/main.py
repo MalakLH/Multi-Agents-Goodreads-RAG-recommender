@@ -9,7 +9,7 @@ from typing import Optional
 from langchain.tools import tool
 from langchain.agents import create_agent
 from langchain_openrouter import ChatOpenRouter
-
+from langgraph.checkpoint.memory import InMemorySaver
 
 
 @dataclass
@@ -84,12 +84,14 @@ model = ChatOpenRouter(
     temperature=0.2,
 )
 
+checkpointer= InMemorySaver()
 
 agent = create_agent(
 
     model=model,
     tools=[book_searcher_tool],
     response_format=SearchResult,
+    checkpointer=checkpointer,
     system_prompt=(
         """
 You are a book recommendation agent.
