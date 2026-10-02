@@ -3,6 +3,7 @@ from config import openrouter_api_key
 
 import requests
 from dataclasses import dataclass
+from typing import Optional
 
 
 from langchain.tools import tool
@@ -15,7 +16,8 @@ from langchain_openrouter import ChatOpenRouter
 class BookRecommendation:
     title: str
     author: str
-    release_year: int
+    release_year: Optional[int]
+    reason: str
 
 
 @dataclass
@@ -24,21 +26,61 @@ class SearchResult:
 
 
 #example of a tool in langchain that can be used by the agent using the decorator @tool. 
+@tool(
+    "book_searcher",
+    description=(
+        "Searches Open Library for books based on the user's preferences. "
+        "Use this tool when you need to discover books matching genres, "
+        "authors, themes, styles, or other book preferences."
+    ),
+)
+def book_searcher_tool(user_preferences: str) -> list[dict]:
 
-@tool('book_searcher', description="searches books based on user preferences", return_direct=True)
-def book_searcher_tool(user_preferences: str) -> list:
-    """
-    Searches for books based on user preferences.
-    Args:
-        user_preferences (str): User preferences for book search.
-    """
+    print("\n=== BOOK SEARCHER ===")
+    print("Query:", user_preferences)
 
+    response = requests.get(
+        "https://openlibrary.org/search.json",
+        params={
+            "q": user_preferences,
+            "limit": 10,
+            "fields": "title,author_name,first_publish_year,key,cover_i",
+        },
+        headers={
+            "User-Agent": "GoodreadsRAGRecommender/1.0"
+        },
+        timeout=10,
+    )
 
+    print("Status:", response.status_code)
 
+    response.raise_for_status()
+
+    data = response.json()
+
+    print("Number of results:", len(data.get("docs", [])))
+    print("First result:", data.get("docs", [])[:1])
+
+    books = []
+
+    for book in data.get("docs", []):
+        authors = book.get("author_name", [])
+
+        books.append({
+            "title": book.get("title"),
+            "author": authors[0] if authors else "Unknown",
+            "release_year": book.get("first_publish_year"),
+            "open_library_key": book.get("key"),
+            "cover_id": book.get("cover_i"),
+        })
+
+    print("Books returned:", books)
+
+    return books
 
 #need to specify that you're using openrouter as the model provider
 model = ChatOpenRouter(
-    model="openrouter/free",
+    model="qwen/qwen3.8-27b:free",
     temperature=0.2,
 )
 
@@ -47,8 +89,24 @@ agent = create_agent(
 
     model=model,
     tools=[book_searcher_tool],
-    system_prompt="You are a humorous book searcher agent who always likes to make jokes and puns about books. You are also very knowledgeable about books and can provide search results based on user preferences.",
-    response_format=SearchResult
+    response_format=SearchResult,
+    system_prompt=(
+        """
+You are a book recommendation agent.
+
+Use the book_searcher tool to find books.
+
+Only recommend books that were returned by the tool.
+
+Return your final answer using the required ResponseFormat structure.
+
+For each recommendation, provide:
+- title
+- author
+- release_year
+- a short reason explaining why it matches the user's preferences.
+"""
+    ),
 
 )
 try:
