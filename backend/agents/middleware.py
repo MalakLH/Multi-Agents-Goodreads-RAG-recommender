@@ -2,8 +2,10 @@ from backend.agents.config import openrouter_api_key
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import ModelRequest, ModelResponse, dynamic_prompt
+from langchain.agents.middleware import ModelRequest, ModelResponse, dynamic_prompt, wrap_model_call
 from langchain_openrouter import ChatOpenRouter
+from langchain.chat_models import init_chat_model
+
 
 
 @dataclass
@@ -31,14 +33,14 @@ def user_role_prompt(request: ModelRequest) -> str:
             return base_prompt
 
 
-model = ChatOpenRouter(
+advanced_model = ChatOpenRouter(
     model="qwen/qwen3.8-27b:free",
     temperature=0.2,
 )
 
 
 agent = create_agent(
-    model=model,
+    model=advanced_model,
     middleware= [user_role_prompt],
     context_schema=context
 )
@@ -53,4 +55,42 @@ response= agent.invoke(
     context= context(user_role='child')
 )
 
-print(response)
+# print(response)
+
+simple_model= advanced_model = ChatOpenRouter(
+    model="openrouter/free",
+    temperature=0.1,
+)
+
+@wrap_model_call
+def dynamic_model_selection(request: ModelRequest, handler) -> ModelResponse:
+
+    message_count=len(request.state['messages'])
+
+    if message_count > 3:
+        model = simple_model
+
+    else:
+        model = advanced_model
+
+    request.model = model
+
+    return handler(request)
+
+
+agent = create_agent(
+    model= simple_model,
+    middleware=[dynamic_model_selection]
+)
+
+result= agent.invoke(
+    {
+        'messages':[{
+            'role': 'user',
+            'content': 'explain TLS.'
+        }]
+    }
+)
+
+print(result['messages'][-1].content)
+print(result['messages'][-1].response_metadata['model_name'])
