@@ -1,8 +1,10 @@
-from config import openrouter_api_key
+from backend.agents.config import openrouter_api_key
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import ModelRequest, ModelResponse, dynamic_prompt
+from langchain_openrouter import ChatOpenRouter
+
 
 @dataclass
 class context:
@@ -27,3 +29,28 @@ def user_role_prompt(request: ModelRequest) -> str:
 
         case _:
             return base_prompt
+
+
+model = ChatOpenRouter(
+    model="qwen/qwen3.8-27b:free",
+    temperature=0.2,
+)
+
+
+agent = create_agent(
+    model=model,
+    middleware= [user_role_prompt],
+    context_schema=context
+)
+
+response= agent.invoke(
+    {
+        'messages': [{
+            'role': 'user',
+            'content': 'Explain TLS.'
+            }]
+    },
+    context= context(user_role='child')
+)
+
+print(response)
