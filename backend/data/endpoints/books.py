@@ -1,9 +1,9 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.data.db.database import get_db
 from backend.data.schemas.book import BookCreate, BookResponse
-from backend.data.crud.books import create_book
+from backend.data.crud.books import create_book, get_book_by_title
 from backend.scraper.book_scraper import book_scraper
 
 
@@ -24,3 +24,15 @@ async def scrape_and_create_book(
     )
 
     return create_book(db, book)
+
+
+def get_book(title: str, db: Session = Depends(get_db)):
+    book = get_book_by_title(db, title)
+
+    if not book:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Book '{title}' not found"
+        )
+
+    return book

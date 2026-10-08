@@ -10,3 +10,10 @@ def create_book(db: Session, book: BookCreate) -> BookResponse:
     db.refresh(db_book)
 
     return db_book
+
+def get_book_by_title(db: Session, title: str):
+    return (
+        db.query(Book)
+        .filter(Book.title.ilike(title))
+        .first()
+    )

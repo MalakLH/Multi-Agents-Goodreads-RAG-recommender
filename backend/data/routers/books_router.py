@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from backend.data.endpoints.books import scrape_and_create_book
+from backend.data.endpoints.books import scrape_and_create_book, get_book
 from backend.data.schemas.book import BookResponse
 
 
@@ -10,8 +10,15 @@ router = APIRouter(
 )
 
 router.add_api_route(
-    "/books/scrape",
+    "/scrape",
     scrape_and_create_book,
     methods=["POST"],
+    response_model=BookResponse
+)
+
+router.add_api_route(
+    "/{title}",
+    get_book,
+    methods=["GET"],
     response_model=BookResponse
 )
