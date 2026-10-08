@@ -1,6 +1,6 @@
 import asyncio
 from playwright.async_api import async_playwright
-from page_scraper import page_scraper
+from backend.scraper.page_scraper import page_scraper
 
 #web scraper for the entire Goodreads "read" shelf, which may span multiple pages. 
 # It uses the page_scraper function to scrape each page and aggregates the results.
