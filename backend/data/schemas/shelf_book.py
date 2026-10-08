@@ -7,8 +7,8 @@ class ShelfBookCreate(BaseModel):
     title: str
     author: str
     book_url: Optional[str] = None
-    user_rating: Optional[float] = None
-    avg_rating: Optional[float] = None
+    user_rating: Optional[str] = None
+    avg_rating: Optional[str] = None
     date_added: Optional[date] = None
 
 
