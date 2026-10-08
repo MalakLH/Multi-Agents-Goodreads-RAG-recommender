@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 router.add_api_route(
-    "/shelf_books",
+    "",
     scrape_and_create_shelf_book,
     methods=["POST"],
     response_model=list[ShelfBookResponse]
