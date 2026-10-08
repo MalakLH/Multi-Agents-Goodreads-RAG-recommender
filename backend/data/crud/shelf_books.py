@@ -9,3 +9,14 @@ def create_shelf_book(db: Session, shelf_book: ShelfBookCreate) -> ShelfBookResp
     db.commit()
     db.refresh(db_shelf_book)
     return db_shelf_book
+
+def book_exist_in_shelf(db: Session, title: str):
+
+    book= db.query(ShelfBook).filter(ShelfBook.title.ilike(title)).first()
+    shelf= True
+
+    if not book:
+        shelf = False
+
+    return shelf
+

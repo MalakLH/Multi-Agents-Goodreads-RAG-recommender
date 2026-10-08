@@ -5,7 +5,7 @@ from typing import Optional
 class BookCreate(BaseModel):
     title: str
     author: str
-    avg_rating: Optional[float] = None
+    avg_rating: Optional[str] = None
     genres: list[str] = Field(default_factory=list)
     description: Optional[str] = None
     reviews: list[str] = Field(default_factory=list)
