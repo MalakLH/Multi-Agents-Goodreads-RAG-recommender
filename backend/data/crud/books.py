@@ -1,5 +1,5 @@
-from models.book import Book
-from schemas.book import BookCreate, BookResponse
+from backend.data.models.book import Book
+from backend.data.schemas.book import BookCreate, BookResponse
 from sqlalchemy.orm import Session
 
 def create_book(db: Session, book: BookCreate) -> BookResponse:

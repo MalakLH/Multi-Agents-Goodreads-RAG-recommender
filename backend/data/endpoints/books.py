@@ -1,10 +1,10 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from schemas.book import BookCreate, BookResponse
-from crud.books import create_book
-from scraper.book_scraper import scrape_book
+from backend.data.db.database import get_db
+from backend.data.schemas.book import BookCreate, BookResponse
+from backend.data.crud.books import create_book
+from backend.scraper.book_scraper import book_scraper
 
 
 async def scrape_and_create_book(
@@ -12,7 +12,7 @@ async def scrape_and_create_book(
     db: Session = Depends(get_db)
 ) -> BookResponse:
 
-    scraped_data = await scrape_book(url)
+    scraped_data = await book_scraper(url)
 
     book = BookCreate(
         title=scraped_data["title"],
