@@ -53,11 +53,10 @@ async def page_scraper(url, page, data):
 
         # Extract average rating
         rating_el = row.locator("td.avg_rating div.value, td.avg_rating").first
-        rating = (
-            await rating_el.inner_text()
-            if await rating_el.count() > 0
-            else ""
-        )
+        if await rating_el.count() > 0:
+            avg_rating = (await rating_el.inner_text()).strip()
+        else:
+            avg_rating = None
 
         # Extract User rating
         stars_el = row.locator("td.rating div.stars").first
@@ -74,7 +73,7 @@ async def page_scraper(url, page, data):
             {
                 "title": title.strip(),
                 "author": author.strip(),
-                "avg_rating": rating.strip(),
+                "avg_rating": avg_rating.strip(),
                 "user_rating": user_rating.strip(),
                 "book_url": book_url,
             }
