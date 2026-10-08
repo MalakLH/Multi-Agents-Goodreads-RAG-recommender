@@ -55,7 +55,7 @@ response= agent.invoke(
     context= context(user_role='child')
 )
 
-# print(response)
+print(response)
 
 simple_model= advanced_model = ChatOpenRouter(
     model="openrouter/free",

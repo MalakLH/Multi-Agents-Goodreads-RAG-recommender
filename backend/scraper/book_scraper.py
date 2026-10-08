@@ -4,7 +4,7 @@ from playwright.async_api import async_playwright
 # WEB SCRAPER FOR INDIVIDUAL GOODREADS BOOK PAGE
 # WE USE IT TO SCRAPE THE BOOK'S TITLE, AUTHOR, DESCRIPTION, GENRES, AND REVIEWS
 
-async def main(url):
+async def book_scraper(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
 
@@ -94,10 +94,6 @@ async def main(url):
             "description": description.strip(),
             "genres": genres,
             "reviews": reviews,
+            "book_url": url,
         }
 
-
-if __name__ == "__main__":
-    url = input("Enter the Goodreads URL to scrape: ").strip()
-    data = asyncio.run(main(url))
-    print("Scraped Data:", data)
