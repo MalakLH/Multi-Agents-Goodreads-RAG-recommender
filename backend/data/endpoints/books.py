@@ -19,6 +19,7 @@ async def scrape_and_create_book(
         author=scraped_data["author"],
         description=scraped_data["description"],
         genres=scraped_data["genres"],
+        avg_rating=scraped_data["avg_rating"],
         reviews=scraped_data["reviews"],
         book_url=scraped_data["book_url"]
     )

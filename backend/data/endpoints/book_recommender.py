@@ -23,4 +23,4 @@ async def scrape_and_create_book(
 
     return create_recommended_book(db, book)
 
-    shelf_book_attached_to: Optional[int] = None
+

@@ -4,6 +4,32 @@ from playwright.async_api import async_playwright
 # WEB SCRAPER FOR INDIVIDUAL GOODREADS BOOK PAGE
 # WE USE IT TO SCRAPE THE BOOK'S TITLE, AUTHOR, DESCRIPTION, GENRES, AND REVIEWS
 
+
+import re
+
+async def extract_average_rating(page):
+    selectors = [
+        "div.RatingStatistics__rating",
+        '[data-testid="averageRating"]',
+        '[itemprop="ratingValue"]',
+    ]
+
+    for selector in selectors:
+        locator = page.locator(selector).first
+
+        if await locator.count() > 0:
+            value = await locator.get_attribute("content")
+
+            if not value:
+                value = await locator.inner_text()
+
+            match = re.search(r"\d+(?:\.\d+)?", value)
+
+            if match:
+                return float(match.group())
+
+    return None
+
 async def book_scraper(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -61,7 +87,13 @@ async def book_scraper(url):
             if genre_name.strip():
                 genres.append(genre_name.strip())
 
-        # 5. Extract Reviews
+        
+
+        # 5. Extract Average Rating
+        avg_rating = await extract_average_rating(page)
+        print("Average rating:", avg_rating)
+
+        # 6. Extract Reviews
         # Expand "Show more" buttons on reviews if present
         show_more_buttons = page.locator('article.ReviewCard button span:has-text("Show more")')
         show_more_count = await show_more_buttons.count()
@@ -93,6 +125,7 @@ async def book_scraper(url):
             "author": author.replace("\xa0", " ").strip(),
             "description": description.strip(),
             "genres": genres,
+            "avg_rating": avg_rating,
             "reviews": reviews,
             "book_url": url,
         }
