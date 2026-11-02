@@ -15,7 +15,7 @@ from backend.scraper.recommendation_scraper import scrape_goodreads_carousel
 async def scrape_and_create_book(
     url: str,
     db: Session = Depends(get_db)
-)-> list[RecommendedBookResponse]:
+):
 
     # 1. Find the original book in the user's shelf
     shelf_book = db.query(ShelfBook).filter(
