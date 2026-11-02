@@ -10,5 +10,5 @@ class ShelfBook(Base):
     author = Column(String, nullable=False)
     book_url = Column(String, nullable=True)
     user_rating = Column(Float, nullable=True)
-    avg_rating = Column(String, nullable=True)
+    avg_rating = Column(Float, nullable=True)
     date_added = Column(Date, nullable=True)

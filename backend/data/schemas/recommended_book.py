@@ -5,7 +5,7 @@ from typing import Optional
 class RecommendedBookCreate(BaseModel):
     title: str
     author: str
-    rating: Optional[str] = None
+    rating: Optional[float] = None
     book_url: Optional[str] = None
     shelf_book_attached_to: Optional[int] = None
 
