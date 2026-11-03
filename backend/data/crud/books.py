@@ -3,6 +3,16 @@ from backend.data.schemas.book import BookCreate, BookResponse
 from sqlalchemy.orm import Session
 
 def create_book(db: Session, book: BookCreate) -> BookResponse:
+
+    existing_book = (
+        db.query(Book)
+        .filter(Book.book_url == book.book_url)
+        .first()
+    )
+
+    if existing_book:
+        return existing_book
+
     db_book = Book(**book.model_dump())
 
     db.add(db_book)

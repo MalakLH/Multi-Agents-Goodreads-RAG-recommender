@@ -21,3 +21,6 @@ router.add_api_route(
     scrape_all,
     methods=["POST"]
 )
+
+
+

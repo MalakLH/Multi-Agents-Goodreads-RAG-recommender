@@ -5,6 +5,7 @@ from backend.data.db.database import get_db
 from backend.data.schemas.book import BookCreate, BookResponse
 from backend.data.crud.books import create_book, get_book_by_title
 from backend.scraper.book_scraper import book_scraper
+from backend.data.services.recommended_book_service import scrape_all_recommended_books
 
 
 async def scrape_and_create_book(
@@ -37,3 +38,8 @@ def get_book(title: str, db: Session = Depends(get_db)):
         )
 
     return book
+
+async def scrape_recommended_details(
+    db: Session = Depends(get_db)
+):
+    return await scrape_all_recommended_books(db)

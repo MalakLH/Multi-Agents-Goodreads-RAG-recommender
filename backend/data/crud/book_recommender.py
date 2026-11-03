@@ -9,3 +9,17 @@ def create_recommended_book(db: Session, recommend_book: RecommendedBookCreate) 
     db.commit()
     db.refresh(db_recommend_book)
     return db_recommend_book
+
+
+def get_recommended_book_urls(db: Session):
+    books = (
+        db.query(RecommendedBook)
+        .filter(RecommendedBook.book_url.isnot(None))
+        .distinct()
+        .all()
+    )
+
+    return [
+        book.book_url
+        for book in books
+    ]

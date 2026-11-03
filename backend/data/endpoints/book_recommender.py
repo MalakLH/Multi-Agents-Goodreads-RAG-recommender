@@ -8,7 +8,7 @@ from backend.data.schemas.recommended_book import (
     RecommendedBookCreate,
     RecommendedBookResponse
 )
-from backend.data.crud.book_recommender import create_recommended_book
+from backend.data.crud.book_recommender import create_recommended_book, get_recommended_book_urls
 from backend.scraper.recommendation_scraper import scrape_goodreads_carousel
 from backend.data.services.recommendation_collection import scrape_all_recommendations
 
