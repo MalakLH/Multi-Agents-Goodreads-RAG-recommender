@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date
+from datetime import datetime
 
 
 class ShelfBookCreate(BaseModel):
@@ -10,6 +11,8 @@ class ShelfBookCreate(BaseModel):
     user_rating: Optional[float] = None
     avg_rating: Optional[float] = None
     date_added: Optional[date] = None
+    recommendations_scraped: bool
+    recommendations_scraped_at: datetime | None = None
 
 
 class ShelfBookResponse(ShelfBookCreate):

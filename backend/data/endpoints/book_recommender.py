@@ -54,3 +54,5 @@ async def scrape_all(db: Session = Depends(get_db)):
 
     result = await scrape_all_recommendations(db)
 
+    return result
+

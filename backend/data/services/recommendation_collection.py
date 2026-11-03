@@ -1,21 +1,29 @@
+
 import logging
+
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
 from backend.data.models.shelf_book import ShelfBook
 from backend.data.models.recommended_book import RecommendedBook
-
-from backend.scraper.recommendation_scraper import scrape_goodreads_carousel
+from backend.scraper.recommendation_scraper import (
+    scrape_goodreads_carousel
+)
 
 logger = logging.getLogger(__name__)
 
 
 async def scrape_all_recommendations(db: Session):
 
-    # 1. Retrieve all shelf books
-    shelf_books = db.query(ShelfBook).all()
+    # 1. Retrieve shelf books that haven't been scraped successfully
+    shelf_books = (
+        db.query(ShelfBook)
+        .filter(ShelfBook.recommendations_scraped.is_(False))
+        .all()
+    )
 
-    # 2. Initialize statistics
+    # 2. Initialize scraping statistics
     stats = {
         "total_books": len(shelf_books),
         "processed_books": 0,
@@ -27,79 +35,106 @@ async def scrape_all_recommendations(db: Session):
         "failures": []
     }
 
-    # 3. Process books sequentially
+    # 3. Process shelf books sequentially
     for shelf_book in shelf_books:
 
-        print(
-            f"Processing: {shelf_book.title}"
+        logger.info(
+            f"Processing shelf book {shelf_book.id}: "
+            f"{shelf_book.title}"
         )
 
-        # 4. Validate source URL
+        # 4. Skip books without a Goodreads URL
         if not shelf_book.book_url:
             stats["skipped_books"] += 1
 
             logger.warning(
                 f"Missing URL for shelf book {shelf_book.id}"
             )
-
             continue
 
         try:
-
-            # 5. Scrape the recommendation carousel
+            # 5. Scrape the Goodreads recommendation carousel
             recommendations = await scrape_goodreads_carousel(
                 shelf_book.book_url
             )
 
-            stats["processed_books"] += 1
-
             stats["total_scraped"] += len(recommendations)
 
-            # 6. Process each recommendation
+            inserted_count = 0
+            duplicate_count = 0
+
+            # Prevent duplicate URLs within the same carousel
+            seen_urls = set()
+
+            # 6. Process each scraped recommendation
             for recommendation in recommendations:
 
-                # Validate required fields
-                if not recommendation.get("title"):
-                    continue
-
+                title = recommendation.get("title")
                 book_url = recommendation.get("book_url")
 
-
-                if not book_url:
+                # Ignore incomplete records
+                if not title or not book_url:
                     continue
 
-                # 7. Check for duplicates
-                existing = db.query(RecommendedBook).filter(
-                    RecommendedBook.book_url == book_url,
-                    RecommendedBook.shelf_book_attached_to
-                    == shelf_book.id
-                ).first()
+                # Ignore duplicate URLs in the current carousel
+                if book_url in seen_urls:
+                    duplicate_count += 1
+                    continue
+
+                seen_urls.add(book_url)
+
+                # 7. Check whether this recommendation already exists
+                existing = (
+                    db.query(RecommendedBook)
+                    .filter(
+                        RecommendedBook.book_url == book_url,
+                        RecommendedBook.shelf_book_attached_to
+                        == shelf_book.id
+                    )
+                    .first()
+                )
 
                 if existing:
-                    stats["duplicates"] += 1
+                    duplicate_count += 1
                     continue
 
-                # 8. Create database record
+                # 8. Create the recommendation record
                 new_recommendation = RecommendedBook(
-                    title=recommendation["title"],
-                    author=recommendation.get("author"),
+                    title=title.strip(),
+                    author=(
+                        recommendation.get("author") or "Unknown"
+                    ).strip(),
                     rating=recommendation.get("rating"),
                     book_url=book_url,
                     shelf_book_attached_to=shelf_book.id
                 )
 
                 db.add(new_recommendation)
+                inserted_count += 1
 
-            # 9. Commit recommendations for this source book
+            # 9. Mark this shelf book as successfully scraped
+            shelf_book.recommendations_scraped = True
+            shelf_book.recommendations_scraped_at = datetime.now(
+                timezone.utc
+            )
+
+            # 10. Commit recommendations and scraping status together
             db.commit()
 
+            # 11. Update statistics after successful commit
+            stats["processed_books"] += 1
+            stats["inserted"] += inserted_count
+            stats["duplicates"] += duplicate_count
+
             logger.info(
-                f"Successfully processed {shelf_book.title}"
+                f"Successfully processed '{shelf_book.title}': "
+                f"{inserted_count} inserted, "
+                f"{duplicate_count} duplicates"
             )
 
         except Exception as e:
 
-            # 10. Roll back failed database operations
+            # Roll back all changes for this shelf book
             db.rollback()
 
             stats["failed_books"] += 1
@@ -111,10 +146,16 @@ async def scrape_all_recommendations(db: Session):
             })
 
             logger.exception(
-                f"Failed to process {shelf_book.title}"
+                f"Failed to process '{shelf_book.title}'"
             )
 
-            # Continue with the next shelf book
             continue
+
+    logger.info(
+        "Scraping completed: "
+        f"{stats['processed_books']} processed, "
+        f"{stats['failed_books']} failed, "
+        f"{stats['inserted']} inserted"
+    )
 
     return stats

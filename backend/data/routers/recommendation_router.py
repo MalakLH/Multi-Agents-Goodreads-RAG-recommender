@@ -19,6 +19,5 @@ router.add_api_route(
 router.add_api_route(
     "/scrape_all",
     scrape_all,
-    methods=["POST"],
-    response_model=list[RecommendedBookResponse]
+    methods=["POST"]
 )
