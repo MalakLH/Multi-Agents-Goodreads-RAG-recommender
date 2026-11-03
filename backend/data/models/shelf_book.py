@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Float
+from sqlalchemy import Column, Integer, String, Date, Float, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from backend.data.db.database import Base
 
@@ -22,3 +22,16 @@ class ShelfBook(Base):
         back_populates="source_book",
         cascade="all, delete-orphan"
     )
+
+    recommendations_scraped = Column(
+    Boolean,
+    nullable=False,
+    default=False,
+    server_default="false"
+    )
+
+    recommendations_scraped_at = Column(
+    DateTime(timezone=True),
+    nullable=True
+    )
+    

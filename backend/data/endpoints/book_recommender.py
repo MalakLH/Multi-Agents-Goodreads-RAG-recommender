@@ -10,6 +10,7 @@ from backend.data.schemas.recommended_book import (
 )
 from backend.data.crud.book_recommender import create_recommended_book
 from backend.scraper.recommendation_scraper import scrape_goodreads_carousel
+from backend.data.services.recommendation_collection import scrape_all_recommendations
 
 
 async def scrape_and_create_book(
@@ -48,3 +49,8 @@ async def scrape_and_create_book(
         created_books.append(created_book)
 
     return created_books
+
+async def scrape_all(db: Session = Depends(get_db)):
+
+    result = await scrape_all_recommendations(db)
+
