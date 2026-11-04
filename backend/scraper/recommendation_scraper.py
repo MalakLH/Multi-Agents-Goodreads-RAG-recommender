@@ -1,5 +1,6 @@
 import asyncio
 from playwright.async_api import async_playwright
+from backend.data.services.normalize_urls import normalize_goodreads_url
 
 # WEB SCRAPER FOR GOODREADS RECOMMENDATION CAROUSEL, For "Readers also enjoyed" section on a book page
 
@@ -58,7 +59,7 @@ async def scrape_goodreads_carousel(url: str):
                 "title": title.strip() if title else None,
                 "author": author.strip() if author else None,
                 "rating": parsed_rating,
-                "book_url": book_url
+                "book_url": normalize_goodreads_url(book_url)
             })
 
         await browser.close()

@@ -27,3 +27,17 @@ def get_book_by_title(db: Session, title: str):
         .filter(Book.title.ilike(title))
         .first()
     )
+
+
+def get_existing_book_urls(db: Session) -> set[str]:
+
+    urls = (
+        db.query(Book.book_url)
+        .filter(
+            Book.book_url.isnot(None),
+            Book.book_url != ""
+        )
+        .all()
+    )
+
+    return {url[0] for url in urls}

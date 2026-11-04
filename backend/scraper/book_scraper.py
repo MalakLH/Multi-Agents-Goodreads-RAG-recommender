@@ -1,5 +1,6 @@
 import asyncio
 from playwright.async_api import async_playwright
+from backend.data.services.normalize_urls import normalize_goodreads_url
 
 # WEB SCRAPER FOR INDIVIDUAL GOODREADS BOOK PAGE
 # WE USE IT TO SCRAPE THE BOOK'S TITLE, AUTHOR, DESCRIPTION, GENRES, AND REVIEWS
@@ -127,6 +128,6 @@ async def book_scraper(url):
             "genres": genres,
             "avg_rating": avg_rating,
             "reviews": reviews,
-            "book_url": url,
+            "book_url": normalize_goodreads_url(url),
         }
 

@@ -11,7 +11,7 @@ class Book(Base):
     title = Column(String, nullable=False)
     author = Column(String, nullable=False)
     avg_rating = Column(Float, nullable=True)
-    book_url = Column(String, nullable=True)
+    book_url = Column(String, unique=True, index=True, nullable=True)
 
     genres = Column(ARRAY(String), nullable=True)
     reviews = Column(ARRAY(String), nullable=True)

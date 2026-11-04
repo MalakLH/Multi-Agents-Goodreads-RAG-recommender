@@ -1,4 +1,6 @@
 from playwright.async_api import async_playwright
+from backend.data.services.normalize_urls import normalize_goodreads_url
+import datetime
 
 #Script to scrape a single Goodreads page with a list of books, "read" shelf. 
 #It extracts the title, author, average rating, user rating, and book URL for each book on the page.
@@ -75,7 +77,9 @@ async def page_scraper(url, page, data):
                 "author": author.strip(),
                 "avg_rating": avg_rating.strip(),
                 "user_rating": user_rating.strip(),
-                "book_url": book_url,
+                "book_url": normalize_goodreads_url(book_url),
+                "date_added": datetime.datetime.now(),
+                "recommendations_scraped": False
             }
         )
 

@@ -29,7 +29,8 @@ async def scrape_and_create_shelf_book(
             book_url=data.get("book_url"),
             user_rating=data.get("user_rating"),
             avg_rating=data.get("avg_rating"),
-            date_added = date.today()
+            date_added = date.today(),
+            recommendations_scraped=data["recommendations_scraped"]
         )
 
         created_book = create_shelf_book(db, shelf_book)
