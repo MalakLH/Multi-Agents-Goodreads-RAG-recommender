@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import relationship
 
 from backend.data.db.database import Base
 
@@ -17,3 +18,8 @@ class Book(Base):
     reviews = Column(ARRAY(String), nullable=True)
 
     description = Column(String, nullable=True)
+
+    shelf_entries = relationship(
+        "ShelfBook",
+        back_populates="book"
+    )

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Float, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from backend.data.db.database import Base
+from sqlalchemy import ForeignKey
 
 
 class ShelfBook(Base):
@@ -24,14 +25,26 @@ class ShelfBook(Base):
     )
 
     recommendations_scraped = Column(
-    Boolean,
-    nullable=False,
-    default=False,
-    server_default="false"
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false"
     )
 
     recommendations_scraped_at = Column(
-    DateTime(timezone=True),
-    nullable=True
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    book_id = Column(
+        Integer,
+        ForeignKey("books.id"),
+        nullable=True,
+        index=True
+    )
+
+    book = relationship(
+        "Book",
+        back_populates="shelf_entries"
     )
     
