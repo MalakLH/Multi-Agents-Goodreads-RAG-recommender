@@ -20,3 +20,15 @@ def book_exist_in_shelf(db: Session, title: str):
 
     return shelf
 
+def get_all_shelf_books(db: Session) -> list[ShelfBook]:
+    """
+    Retrieve all books belonging to the current shelf.
+
+    The current model has no user_id column, so this retrieves
+    all records in shelf_books.
+    """
+    return (
+        db.query(ShelfBook)
+        .order_by(ShelfBook.id.asc())
+        .all()
+    )
